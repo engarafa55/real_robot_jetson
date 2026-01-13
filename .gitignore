@@ -1,0 +1,8 @@
+build/
+install/
+log/
+*.pyc
+*.webm
+*.mp4
+*.bag
+.vscode/
