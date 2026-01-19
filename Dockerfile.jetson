@@ -28,10 +28,11 @@ RUN apt-get update && apt-get install -y \
 # 2. Install Python packages
 RUN pip3 install pyserial
 
-# 3. Install I2C tools and Python SMBus for MPU6050
+# 3. Install I2C tools and dependencies for MPU6050 (Python & C++)
 RUN apt-get update && apt-get install -y \
     python3-smbus \
     i2c-tools \
+    libi2c-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # 4. Create a non-root user and add to dialout (CRITICAL for Arduino)
