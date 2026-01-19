@@ -42,7 +42,7 @@ ARG USER_GID=$USER_UID
 
 RUN groupadd --gid $USER_GID $USERNAME \
   && useradd -s /bin/bash --uid $USER_UID --gid $USER_GID -m $USERNAME \
-  && usermod -aG dialout $USERNAME \
+  && usermod -aG dialout,i2c,plugdev $USERNAME \
   && mkdir /home/$USERNAME/.config && chown $USER_UID:$USER_GID /home/$USERNAME/.config
 
 # 5. Set up sudo
