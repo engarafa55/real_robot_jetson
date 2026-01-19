@@ -183,6 +183,22 @@
         <mu2 value="0.001"/>
     </gazebo>
 
+    <!-- IMU LINK -->
+    <link name="imu_link">
+    <visual>
+        <geometry>
+            <box size="0.01 0.01 0.01"/>
+        </geometry>
+        <material name="black"/>
+    </visual>
+    </link>
+
+    <joint name="imu_joint" type="fixed">
+        <parent link="base_link"/>
+        <child link="imu_link"/>
+        <origin xyz="0 0 0.05" rpy="0 0 0"/>
+    </joint>
+
 
     <!-- BACK CASTER WHEEL LINK -->
 

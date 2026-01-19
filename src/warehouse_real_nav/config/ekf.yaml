@@ -1,0 +1,43 @@
+### ekf_node config file ###
+ekf_filter_node:
+    ros__parameters:
+        frequency: 30.0
+        two_d_mode: true
+        publish_tf: true
+        
+        # Frame definitions
+        map_frame: map              
+        odom_frame: odom            
+        base_link_frame: base_link  
+        world_frame: odom           
+
+        # -------------------------------------
+        # Source 1: Wheel Encoders (Odometry)
+        # -------------------------------------
+        # Topic name based on your 'ros2 topic list' output
+        odom0: /diff_cont/odom
+        
+        # Configuration: [x, y, z, roll, pitch, yaw, vx, vy, vz, vroll, vpitch, vyaw, ax, ay, az]
+        # We use velocities (vx, vyaw) as they are more accurate from encoders
+        odom0_config:  [false, false, false,
+                        false, false, false,
+                        true,  true,  false,
+                        false, false, true,
+                        false, false, false]
+        odom0_differential: false
+        odom0_queue_size: 10
+
+        # -------------------------------------
+        # Source 2: IMU Sensor (MPU6050)
+        # -------------------------------------
+        imu0: /imu
+        # We use Angular Velocity (Gyro Z) and Linear Acceleration (Accel X)
+        # Note: Yaw is ignored because MPU6050 has no magnetometer
+        imu0_config: [false, false, false,
+                      false, false, false,
+                      false, false, false,
+                      false, false, true,
+                      true,  false, false]
+        imu0_differential: false
+        imu0_queue_size: 10
+        imu0_remove_gravitational_acceleration: true
