@@ -33,7 +33,7 @@ services:
       # - /dev/ttyUSB0:/dev/ttyUSB0 
       # Access to graphics card for rendering
       - /dev/dri:/dev/dri
-      - /dev/ttyUSB0:/dev/ttyUSB0
+      # - /dev/ttyUSB0:/dev/ttyUSB0
       - /dev/ttyACM0:/dev/ttyACM0
 
     # Keep the container running so you can attach to it
