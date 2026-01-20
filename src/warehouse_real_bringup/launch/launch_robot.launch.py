@@ -17,9 +17,8 @@ from launch_ros.actions import Node
 def generate_launch_description():
 
 
-    # Include the robot_state_publisher launch file, provided by our own package. Force sim time to be enabled
+    # Include the robot_state_publisher launch file
     # !!! MAKE SURE YOU SET THE PACKAGE NAME CORRECTLY !!!
-
     package_name='warehouse_real_description' #<--- CHANGE ME
 
     rsp = IncludeLaunchDescription(
@@ -37,13 +36,10 @@ def generate_launch_description():
         )
 
     
-    # ---------------------------------------------------------
-    # التعديل هنا: بدل ما نجيب الديسكربشن من نود تانية، هنقرأ الملف علطول
-    # ---------------------------------------------------------
+    # Process the URDF file
     xacro_file = os.path.join(get_package_share_directory(package_name),'description','robot.urdf.xacro')
     
-    # بنعمل أمر عشان يحول الـ xacro لـ xml
-    # لاحظ اننا ضيفنا use_ros2_control و sim_mode عشان نتأكد ان الهاردوير يشتغل صح
+    # Run xacro command to convert to XML
     robot_description = Command(['xacro ', xacro_file, ' use_ros2_control:=true', ' sim_mode:=false'])
 
 
@@ -58,6 +54,7 @@ def generate_launch_description():
 
     delayed_controller_manager = TimerAction(period=3.0, actions=[controller_manager])
 
+    # --- Diff Drive Spawner ---
     diff_drive_spawner = Node(
         package="controller_manager",
         executable="spawner",
@@ -71,6 +68,7 @@ def generate_launch_description():
         )
     )
 
+    # --- Joint State Broadcaster Spawner ---
     joint_broad_spawner = Node(
         package="controller_manager",
         executable="spawner",
@@ -84,6 +82,23 @@ def generate_launch_description():
         )
     )
 
+    # ---------------------------------------------------------
+    # NEW: Lifter Controller Spawner
+    # ---------------------------------------------------------
+    lifter_spawner = Node(
+        package="controller_manager",
+        executable="spawner",
+        arguments=["lifter_controller"],
+    )
+
+    # Delay start until controller manager is active
+    delayed_lifter_spawner = RegisterEventHandler(
+        event_handler=OnProcessStart(
+            target_action=controller_manager,
+            on_start=[lifter_spawner],
+        )
+    )
+
 
     # Launch them all!
     return LaunchDescription([
@@ -91,5 +106,6 @@ def generate_launch_description():
         twist_mux,
         delayed_controller_manager,
         delayed_diff_drive_spawner,
-        delayed_joint_broad_spawner
+        delayed_joint_broad_spawner,
+        delayed_lifter_spawner # <--- Don't forget to add this!
     ])

@@ -1,16 +1,14 @@
-#ifndef DIFFDRIVE_ARDUINO_ARDUINO_COMMS_HPP
-#define DIFFDRIVE_ARDUINO_ARDUINO_COMMS_HPP
+#ifndef ARDUINO_HARDWARE_INTERFACE_ARDUINO_COMMS_HPP
+#define ARDUINO_HARDWARE_INTERFACE_ARDUINO_COMMS_HPP
 
-// #include <cstring>
 #include <sstream>
-// #include <cstdlib>
 #include <libserial/SerialPort.h>
 #include <iostream>
 
-
+namespace arduino_hardware_interface
+{
 LibSerial::BaudRate convert_baud_rate(int baud_rate)
 {
-  // Just handle some common baud rates
   switch (baud_rate)
   {
     case 1200: return LibSerial::BaudRate::BAUD_1200;
@@ -31,9 +29,7 @@ LibSerial::BaudRate convert_baud_rate(int baud_rate)
 
 class ArduinoComms
 {
-
 public:
-
   ArduinoComms() = default;
 
   void connect(const std::string &serial_device, int32_t baud_rate, int32_t timeout_ms)
@@ -53,16 +49,14 @@ public:
     return serial_conn_.IsOpen();
   }
 
-
   std::string send_msg(const std::string &msg_to_send, bool print_output = false)
   {
-    serial_conn_.FlushIOBuffers(); // Just in case
+    serial_conn_.FlushIOBuffers(); 
     serial_conn_.Write(msg_to_send);
 
     std::string response = "";
     try
     {
-      // Responses end with \r\n so we will read up to (and including) the \n.
       serial_conn_.ReadLine(response, '\n', timeout_ms_);
     }
     catch (const LibSerial::ReadTimeout&)
@@ -77,7 +71,6 @@ public:
 
     return response;
   }
-
 
   void send_empty_msg()
   {
@@ -96,11 +89,25 @@ public:
     val_1 = std::atoi(token_1.c_str());
     val_2 = std::atoi(token_2.c_str());
   }
+  
   void set_motor_values(int val_1, int val_2)
   {
     std::stringstream ss;
     ss << "m " << val_1 << " " << val_2 << "\r";
     send_msg(ss.str());
+  }
+
+  // Lift command sender
+  void set_lift_val(int val)
+  {
+    std::stringstream ss;
+    ss << "l " << val << "\r"; 
+    send_msg(ss.str());
+  }
+  
+  void reset_encoders()
+  {
+    send_msg("r\r"); 
   }
 
   void set_pid_values(int k_p, int k_d, int k_i, int k_o)
@@ -114,5 +121,6 @@ private:
     LibSerial::SerialPort serial_conn_;
     int timeout_ms_;
 };
+} // namespace arduino_hardware_interface
 
-#endif // DIFFDRIVE_ARDUINO_ARDUINO_COMMS_HPP
+#endif // ARDUINO_HARDWARE_INTERFACE_ARDUINO_COMMS_HPP

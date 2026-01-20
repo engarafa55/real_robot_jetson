@@ -1,10 +1,11 @@
-#ifndef DIFFDRIVE_ARDUINO_WHEEL_HPP
-#define DIFFDRIVE_ARDUINO_WHEEL_HPP
+#ifndef ARDUINO_HARDWARE_INTERFACE_WHEEL_HPP
+#define ARDUINO_HARDWARE_INTERFACE_WHEEL_HPP
 
 #include <string>
 #include <cmath>
 
-
+namespace arduino_hardware_interface
+{
 class Wheel
 {
     public:
@@ -22,7 +23,6 @@ class Wheel
     {
       setup(wheel_name, counts_per_rev);
     }
-
     
     void setup(const std::string &wheel_name, int counts_per_rev)
     {
@@ -34,10 +34,7 @@ class Wheel
     {
       return enc * rads_per_count;
     }
-
-
-
 };
+} // namespace arduino_hardware_interface
 
-
-#endif // DIFFDRIVE_ARDUINO_WHEEL_HPP
+#endif // ARDUINO_HARDWARE_INTERFACE_WHEEL_HPP
