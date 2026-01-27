@@ -29,6 +29,21 @@ RUN apt-get update && apt-get install -y \
     ros-humble-gazebo-plugins \
     && rm -rf /var/lib/apt/lists/*
 
+# Install Joint State Publisher GUI
+RUN apt-get update && apt-get install -y \
+    ros-humble-joint-state-publisher-gui \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Python packages
+RUN pip3 install pyserial
+
+# Install I2C tools and dependencies for MPU6050 (Python & C++)
+RUN apt-get update && apt-get install -y \
+    python3-smbus \
+    i2c-tools \
+    libi2c-dev \
+    && rm -rf /var/lib/apt/lists/*
+
 # 2. Create a non-root user and add to dialout (CRITICAL for Arduino)
 ARG USERNAME=ros
 ARG USER_UID=1000

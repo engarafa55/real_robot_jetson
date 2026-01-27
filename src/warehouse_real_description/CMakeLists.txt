@@ -24,7 +24,7 @@ if(BUILD_TESTING)
 endif()
 
 install(
-  DIRECTORY config description worlds rviz
+  DIRECTORY config description worlds rviz launch
   DESTINATION share/${PROJECT_NAME}
 )
 
