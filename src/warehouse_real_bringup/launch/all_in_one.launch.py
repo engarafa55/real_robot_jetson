@@ -7,12 +7,12 @@ from launch.launch_description_sources import PythonLaunchDescriptionSource
 def generate_launch_description():
     # 1. Get package directories
     bringup_pkg = get_package_share_directory('warehouse_real_bringup')
-    description_pkg = get_package_share_directory('warehouse_real_description')
+    nav_pkg = get_package_share_directory('warehouse_real_nav')
 
     # 2. Define launch file paths
     launch_robot_path = os.path.join(bringup_pkg, 'launch', 'launch_robot.launch.py')
     rplidar_path = os.path.join(bringup_pkg, 'launch', 'rplidar.launch.py')
-    sensor_fusion_path = os.path.join(description_pkg, 'launch', 'sensor_fusion.launch.py')
+    sensor_fusion_path = os.path.join(nav_pkg, 'launch', 'sensor_fusion.launch.py')
 
     # 3. Create IncludeLaunchDescription actions
     launch_robot_cmd = IncludeLaunchDescription(
