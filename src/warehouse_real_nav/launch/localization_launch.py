@@ -64,7 +64,7 @@ def generate_launch_description():
 
         DeclareLaunchArgument(
             'map',
-            default_value=os.path.join('warehouse_real_slam', 'maps', 'turtlebot3_world.yaml'),
+            default_value=os.path.join('warehouse_real_slam', 'maps', 'sim_map_save.yaml'),
             description='Full path to map yaml file to load'),
 
         DeclareLaunchArgument(

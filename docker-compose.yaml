@@ -19,6 +19,7 @@ services:
       - TERM=xterm-256color
       # Force software rendering if hardware acceleration fails (Fixes the crash)
       - LIBGL_ALWAYS_SOFTWARE=1 
+      - MESA_GL_VERSION_OVERRIDE=3.3
     
     # Volumes: Map X11 for GUI and your src folder for code
     volumes:
@@ -34,7 +35,7 @@ services:
       # Access to graphics card for rendering
       - /dev/dri:/dev/dri
       # - /dev/ttyUSB0:/dev/ttyUSB0
-      - /dev/ttyACM0:/dev/ttyACM0
+      # - /dev/ttyACM0:/dev/ttyACM0
 
     # Keep the container running so you can attach to it
     command: sleep infinity

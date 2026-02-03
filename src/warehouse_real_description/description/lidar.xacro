@@ -1,10 +1,14 @@
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro" >
 
+    <material name="dark_red">
+        <color rgba="0.6 0.0 0.0 1.0"/>
+    </material>
+    
     <joint name="laser_joint" type="fixed">
         <parent link="chassis"/>
         <child link="laser_frame"/>
-        <origin xyz="0.122 0 0.212" rpy="0 0 0"/>
+        <origin xyz="0.363 0 0.0785" rpy="0 0 0"/>
     </joint>
 
     <link name="laser_frame">
@@ -12,15 +16,9 @@
             <geometry>
                 <cylinder radius="0.05" length="0.04"/>
             </geometry>
-            <material name="black"/>
+            <material name="dark_red"/>
         </visual>
-        <visual>
-            <origin xyz="0 0 -0.05"/>
-            <geometry>
-                <cylinder radius="0.01" length="0.1"/>
-            </geometry>
-            <material name="black"/>
-        </visual>
+
         <collision>
             <geometry>
                 <cylinder radius="0.05" length="0.04"/>
@@ -44,8 +42,8 @@
                 <scan>
                     <horizontal>
                         <samples>720</samples>
-                        <min_angle>-3.14</min_angle>
-                        <max_angle>3.14</max_angle>
+                        <min_angle>-2.007</min_angle>
+                        <max_angle>2.007</max_angle>
                     </horizontal>
                 </scan>
                 <range>

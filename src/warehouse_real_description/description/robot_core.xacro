@@ -4,8 +4,8 @@
     <xacro:include filename="inertial_macros.xacro"/>
 
 
-    <xacro:property name="chassis_length" value="0.6"/>
-    <xacro:property name="chassis_width" value="0.5"/>
+    <xacro:property name="chassis_length" value="0.86"/>
+    <xacro:property name="chassis_width" value="0.62"/>
     <xacro:property name="chassis_height" value="0.15"/>
     <xacro:property name="chassis_mass" value="30.0"/>
     <xacro:property name="wheel_radius" value="0.0625"/>
@@ -13,18 +13,18 @@
     <xacro:property name="wheel_mass" value="0.5"/>
     <xacro:property name="wheel_offset_x" value="0"/>
     <xacro:property name="wheel_offset_y" value="0.25"/>
-    <xacro:property name="wheel_offset_z" value="${wheel_radius - (caster_wheel_radius*2)}"/>
+    <xacro:property name="wheel_offset_z" value="0.04"/>
     <xacro:property name="caster_wheel_radius" value="${0.03/2.0}"/>
     <xacro:property name="caster_wheel_mass" value="0.3"/>
     <xacro:property name="caster_wheel_offset_x" value="0.15"/>
-    <xacro:property name="caster_wheel_offset_z" value="${-caster_wheel_radius}"/>
+    <xacro:property name="caster_wheel_offset_z" value="0.014"/>
 
     <material name="white">
         <color rgba="1 1 1 1" />
     </material>
 
     <material name="orange">
-        <color rgba="1 0.3 0.1 1"/>
+        <color rgba="1.0 0.5 0.1 1.0"/>
     </material>
 
     <material name="blue">
@@ -61,21 +61,30 @@
     <joint name="chassis_joint" type="fixed">
         <parent link="base_link"/>
         <child link="chassis"/>
-        <origin xyz="0 0 ${0.03/2.0}"/>
+        <origin xyz="0 0 0.0225"/>
     </joint>
     
     <link name="chassis">
         <visual>
-            <origin xyz="0 0 ${chassis_height/2}"/>
+            <origin xyz="-0.445 -0.31 -0.015" rpy="${pi/2} 0 ${pi/2}"/>
             <geometry>
-                <box size="${chassis_length} ${chassis_width} ${chassis_height}"/>
+                <mesh filename="package://warehouse_real_description/meshes/chassis.STL" scale="0.001 0.001 0.001"/>
             </geometry>
-            <material name="orange"/>
+            <material name="black"/>
         </visual>
+        <!-- Rear Body Collision (75% Length, Raised 6cm for Caster Clearance) -->
         <collision>
-            <origin xyz="${chassis_length/2} 0 ${chassis_height/2}"/>
+            <origin xyz="${-chassis_length/8} 0 0.105" rpy="0 0 0"/>
             <geometry>
-                <box size="${chassis_length} ${chassis_width} ${chassis_height}"/>
+                <box size="${chassis_length*0.75} 0.45 0.09"/>
+            </geometry>
+        </collision>
+
+        <!-- Front Top Lip Collision (25% Length, Top 5th for Lidar Clearance) -->
+        <collision>
+            <origin xyz="${3*chassis_length/8} 0 ${9*chassis_height/10}" rpy="0 0 0"/>
+            <geometry>
+                <box size="${chassis_length*0.25} 0.45 ${chassis_height/5}"/>
             </geometry>
         </collision>
         <xacro:inertial_box mass="0.5" x="${chassis_length}" y="${chassis_width}" z="${chassis_height}">
@@ -86,6 +95,28 @@
     <gazebo reference="chassis">
         <material>Gazebo/White</material>
     </gazebo>
+
+
+    <!-- SIDE COVER LINK -->
+    <joint name="side_cover_joint" type="fixed">
+        <parent link="chassis"/>
+        <child link="side_cover"/>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+    </joint>
+
+    <link name="side_cover">
+        <visual>
+            <origin xyz="-0.407 -0.303 -0.0035" rpy="${pi/2} 0 ${pi/2}"/>
+            <geometry>
+                <mesh filename="package://warehouse_real_description/meshes/side_cover.STL" scale="0.001 0.001 0.001"/>
+            </geometry>
+            <material name="orange"/>
+        </visual>
+        <xacro:inertial_box mass="0.1" x="0.1" y="0.1" z="0.1">
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+        </xacro:inertial_box>
+    </link>
+
 
     <!-- LEFT WHEEL LINK -->
 
@@ -151,37 +182,43 @@
     </gazebo>
 
 
-    <!-- CASTER WHEEL LINK -->
+    <!-- CASTER WHEEL MACRO -->
+    <xacro:macro name="caster_wheel" params="prefix x_pos y_pos">
+        <joint name="${prefix}_caster_wheel_joint" type="fixed">
+            <parent link="chassis"/>
+            <child link="${prefix}_caster_wheel"/>
+            <origin xyz="${x_pos} ${y_pos} ${caster_wheel_offset_z}"/>
+        </joint>
 
-    <joint name="front_caster_wheel_joint" type="fixed">
-        <parent link="chassis"/>
-        <child link="front_caster_wheel"/>
-        <origin xyz="${caster_wheel_offset_x} 0 ${caster_wheel_offset_z}"/>
-    </joint>
+        <link name="${prefix}_caster_wheel">
+            <visual>
+                <geometry>
+                    <sphere radius="0.0365"/>
+                </geometry>
+                <material name="white"/>
+            </visual>
+            <collision>
+                <geometry>
+                    <sphere radius="0.0365"/>
+                </geometry>
+            </collision>
+            <xacro:inertial_sphere mass="0.1" radius="0.0365">
+                <origin xyz="0 0 0" rpy="0 0 0"/>
+            </xacro:inertial_sphere>
+        </link>
 
+        <gazebo reference="${prefix}_caster_wheel">
+            <material>Gazebo/White</material>
+            <mu1 value="0.001"/>
+            <mu2 value="0.001"/>
+        </gazebo>
+    </xacro:macro>
 
-    <link name="front_caster_wheel">
-        <visual>
-            <geometry>
-                <sphere radius="${caster_wheel_radius}"/>
-            </geometry>
-            <material name="white"/>
-        </visual>
-        <collision>
-            <geometry>
-                <sphere radius="${caster_wheel_radius}"/>
-            </geometry>
-        </collision>
-        <xacro:inertial_sphere mass="${caster_wheel_mass}" radius="${caster_wheel_radius}">
-            <origin xyz="0 0 0" rpy="0 0 0"/>
-        </xacro:inertial_sphere>
-    </link>
-
-    <gazebo reference="front_caster_wheel">
-        <material>Gazebo/Blue</material>
-        <mu1 value="0.001"/>
-        <mu2 value="0.001"/>
-    </gazebo>
+    <!-- CASTER WHEEL INSTANCES -->
+    <xacro:caster_wheel prefix="front_right" x_pos="0.25" y_pos="-0.165"/>
+    <xacro:caster_wheel prefix="front_left" x_pos="0.25" y_pos="0.165"/>
+    <xacro:caster_wheel prefix="rear_right" x_pos="-0.25" y_pos="-0.165"/>
+    <xacro:caster_wheel prefix="rear_left" x_pos="-0.25" y_pos="0.165"/>
 
     <!-- IMU LINK -->
     <link name="imu_link">
@@ -201,32 +238,31 @@
 
     <link name="lifter_link">
         <visual>
-            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <origin xyz="-0.15 -0.305 -0.19" rpy="${pi/2} 0 ${pi/2}"/>
             <geometry>
-                <box size="0.2 0.2 0.05"/>
+                <mesh filename="package://warehouse_real_description/meshes/lifter.STL" scale="0.001 0.001 0.001"/>
             </geometry>
-            <material name="grey">
-                <color rgba="0.5 0.5 0.5 1.0"/>
-            </material>
+            <material name="orange"/>
         </visual>
         <collision>
             <origin xyz="0 0 0" rpy="0 0 0"/>
             <geometry>
-                <box size="0.2 0.2 0.05"/>
+                <box size="0.3 ${chassis_width} 0.02"/>
             </geometry>
         </collision>
         <inertial>
-            <mass value="0.5"/>
+            <mass value="0.1"/>
             <inertia ixx="0.001" ixy="0.0" ixz="0.0" iyy="0.001" iyz="0.0" izz="0.001"/>
         </inertial>
     </link>
 
     <joint name="lifter_joint" type="prismatic">
         <parent link="chassis"/> <child link="lifter_link"/>
-        <origin xyz="0 0 0.25" rpy="0 0 0"/>
+        <origin xyz="0 0 0.19" rpy="0 0 0"/>
         <axis xyz="0 0 1"/>
         <limit lower="0.0" upper="0.20" effort="100.0" velocity="0.5"/>
     </joint>
+
 
     <!-- BACK CASTER WHEEL LINK -->
 

@@ -96,6 +96,19 @@ def generate_launch_description():
         )
     )
 
+    lifter_spawner = Node(
+        package="controller_manager",
+        executable="spawner",
+        arguments=["lifter_controller"],
+    )
+
+    delayed_lifter_spawner = RegisterEventHandler(
+        event_handler=OnProcessExit(
+            target_action=spawn_entity,
+            on_exit=[lifter_spawner],
+        )
+    )
+
 
     # Launch them all!
     return LaunchDescription([
@@ -105,5 +118,6 @@ def generate_launch_description():
         gazebo,
         spawn_entity,
         delayed_diff_drive_spawner, # شغلنا المتأخر
-        delayed_joint_broad_spawner # شغلنا المتأخر
+        delayed_joint_broad_spawner, # شغلنا المتأخر
+        delayed_lifter_spawner
     ])
